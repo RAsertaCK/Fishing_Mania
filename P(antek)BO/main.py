@@ -9,10 +9,11 @@ class Game:
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
+        self.camera = pygame.Vector2(0, 0)  # Initialize camera offset
 
         self.character_spritesheet = spritesheet('assets/player.png')
 
-        # Grup untuk menyimpan semua blocks
+        # Group for storing all blocks
         self.blocks = pygame.sprite.Group()
 
     def createTilemap(self):
@@ -21,9 +22,9 @@ class Game:
                 Ground(self, j, i)
                 if column == "B":
                     block = Block(self, j, i)
-                    self.blocks.add(block)  # Menambahkan block ke grup blocks
+                    self.blocks.add(block)  # Add block to blocks group
                 if column == "P":
-                    Player(self, j, i)
+                    self.player = Player(self, j, i)  # Store reference to player
 
     def new(self):
         self.playing = True
@@ -33,20 +34,27 @@ class Game:
         self.createTilemap()
 
     def event(self):
-        #game loop event
+        # game loop event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
                 self.running = False
 
     def update(self):
-        #game loop update
+        # game loop update
         self.all_sprites.update()
 
+    def update_camera(self):
+        # Center the camera on the player
+        self.camera.x = self.player.rect.centerx - WIN_WIDTH // 2
+        self.camera.y = self.player.rect.centery - WIN_HEIGHT // 2
+
     def draw(self):
-        #game loop draw
+        # game loop draw
         self.screen.fill(BLUE)
-        self.all_sprites.draw(self.screen)
+        for sprite in self.all_sprites:
+            # Adjust the position of each sprite based on the camera offset
+            self.screen.blit(sprite.image, sprite.rect.topleft - self.camera)
         self.clock.tick(FPS)
         pygame.display.update()
 
@@ -54,6 +62,7 @@ class Game:
         while self.playing:
             self.event()
             self.update()
+            self.update_camera()  # Update camera position
             self.draw()
             self.running = False
 
@@ -72,3 +81,4 @@ while g.running:
 
 pygame.quit()
 sys.exit() 
+
