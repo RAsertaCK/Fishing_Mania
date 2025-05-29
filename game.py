@@ -46,19 +46,20 @@ class Game:
             print(f"--- Game: ERROR debug font: {e}. ---"); self.debug_font = pygame.font.Font(None, 24)
 
         self.current_state_name = 'main_menu'; self.wallet = 100
-        self.inventory = Inventory(); self.market = Market(self)
+        self.inventory = Inventory(self) # <--- SUDAH BENAR
+        self.market = Market(self)
         class InitialDummyMap:
             def __init__(self): self.name = "initial"; self.data = {'depth_range': (10,100)}; self.background_image = pygame.Surface((Config.SCREEN_WIDTH,Config.SCREEN_HEIGHT)); self.background_image.fill((0,0,50)) #
         self.fishing_world_rect = pygame.Rect(0,0,self.config.SCREEN_WIDTH,self.config.SCREEN_HEIGHT) #
         
         # ---- TARGET POSISI GARIS AIR DI LAYAR (Y dari atas layar) ----
         # Sesuai garis hitam di screenshot Anda, yaitu sekitar Y=432 (untuk layar 720p).
-        self.desired_waterline_on_screen_y = 432 
+        self.desired_waterline_on_screen_y = 432
         # Jika ingin tetap pakai persentase: (432.0 / self.config.SCREEN_HEIGHT) * self.config.SCREEN_HEIGHT
         # self.desired_waterline_on_screen_y = self.config.SCREEN_HEIGHT * 0.60 # 60% dari atas layar (432 / 720 = 0.6)
 
 
-        self.water_top_y_world = 0 
+        self.water_top_y_world = 0
         self.water_bottom_y_world = 0
         
         self.boat = Boat(InitialDummyMap(), self.config, self.fishing_world_rect) #
@@ -103,7 +104,7 @@ class Game:
                     self.fishing_camera.world_height = fishing_world_height
                     
                     # Y DUNIA untuk bagian BAWAH kapal akan sama dengan Y LAYAR yang diinginkan untuk garis air.
-                    target_boat_bottom_y_world = self.desired_waterline_on_screen_y 
+                    target_boat_bottom_y_world = self.desired_waterline_on_screen_y
 
                     initial_boat_world_x = self.fishing_world_rect.centerx
                     
@@ -162,8 +163,7 @@ class Game:
             if fish_data:
                 spawn_x = random.randint(self.fishing_world_rect.left + 20, self.fishing_world_rect.right - 20)
                 spawn_y = random.randint(int(self.water_top_y_world), int(self.water_bottom_y_world))
-                self.visible_fish_sprites.add(Fish(fish_data, (spawn_x, spawn_y), self.config)) #
-
+                self.visible_fish_sprites.add(Fish(fish_data, (spawn_x, spawn_y), self.config)) # <--- Pastikan ini juga meneruskan self.config
 
     def play_music_file(self, music_path, loop=-1):
         # ... (Sama seperti sebelumnya) ...
@@ -197,7 +197,7 @@ class Game:
             if self.fishing_system and self.fishing_system.handle_event(event): handled=True #
             if not handled and event.type==pygame.KEYDOWN and event.key==pygame.K_ESCAPE: self.change_state('map_explore'); handled=True
         if handled: return
-        handlers = {'main_menu':self.main_menu,'settings':self.settings_menu,'shop':self.shop_menu, 
+        handlers = {'main_menu':self.main_menu,'settings':self.settings_menu,'shop':self.shop_menu,
                     'market_screen':self.market_screen,'inventory_screen':self.inventory_screen,
                     'land_explore':self.land_explorer,'map_explore':self.map_explorer}
         active_handler = handlers.get(self.current_state_name)
@@ -244,7 +244,7 @@ class Game:
 
     def render_current_state(self):
         deep_sea_fill_color = self.config.COLORS.get('deep_ocean_blue', (20, 25, 60)) #
-        self.screen.fill(deep_sea_fill_color) 
+        self.screen.fill(deep_sea_fill_color)
 
         active_renderer = None
         if self.current_state_name == 'main_menu': active_renderer = self.main_menu
@@ -255,7 +255,7 @@ class Game:
         elif self.current_state_name == 'inventory_screen': active_renderer = self.inventory_screen
 
         if active_renderer and hasattr(active_renderer, 'render'):
-            active_renderer.render(self.screen) 
+            active_renderer.render(self.screen)
         
         elif self.current_state_name == 'land_explore': #
             if self.land_explorer: self.land_explorer.render(self.screen) #
@@ -265,7 +265,7 @@ class Game:
             if self.current_game_map and self.current_game_map.background_image and self.fishing_camera: #
                 bg_img = self.current_game_map.background_image #
                 bg_img_width = bg_img.get_width()
-                bg_img_height = bg_img.get_height() 
+                bg_img_height = bg_img.get_height()
 
                 if bg_img_width > 0 and self.boat and self.boat.rect: #
                     # ---- PENEMPATAN BACKGROUND LANGIT/CAKRAWALA ----
@@ -280,7 +280,7 @@ class Game:
                     background_top_world_y = waterline_world_y - horizon_offset_in_bg_image
                     
                     camera_world_left_x = self.fishing_camera.camera_rect.left #
-                    start_tile_index = int(camera_world_left_x // bg_img_width) -1 
+                    start_tile_index = int(camera_world_left_x // bg_img_width) -1
                     tiles_on_screen_approx = int(self.config.SCREEN_WIDTH // bg_img_width) + 3 #
 
                     for i in range(start_tile_index, start_tile_index + tiles_on_screen_approx):
@@ -293,7 +293,9 @@ class Game:
             if self.fishing_camera: #
                 for fish_sprite in self.visible_fish_sprites:
                     if fish_sprite.image and fish_sprite.rect:
-                        img_to_render = pygame.transform.flip(fish_sprite.image, fish_sprite.swim_direction < 0, False)
+                        # PERBAIKAN MOONWALK: Asumsi sprite ikan asli menghadap KIRI.
+                        # Jika sprite asli menghadap KANAN, ubah 'fish_sprite.swim_direction > 0' menjadi 'fish_sprite.swim_direction < 0'
+                        img_to_render = pygame.transform.flip(fish_sprite.image, fish_sprite.swim_direction > 0, False) # <--- PERBAIKAN MOONWALK
                         self.screen.blit(img_to_render, self.fishing_camera.apply(fish_sprite.rect)) #
             if self.boat and hasattr(self.boat, 'render_with_camera') and self.fishing_camera: #
                  self.boat.render_with_camera(self.screen, self.fishing_camera) #

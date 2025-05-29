@@ -5,8 +5,8 @@ import os
 class Config:
     # ... (Definisi konstanta lainnya tetap sama) ...
     # Display
-    SCREEN_WIDTH = 1290
-    SCREEN_HEIGHT = 720
+    SCREEN_WIDTH = 1920
+    SCREEN_HEIGHT = 1080
     FPS = 60
     DEBUG = True 
 

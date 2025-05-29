@@ -1,7 +1,8 @@
 # inventory.py
 class Inventory:
-    def __init__(self):
+    def __init__(self, game_instance):
         self.fish_list = []
+        self.game = game_instance
 
     def add(self, fish):
         self.fish_list.append(fish)
@@ -12,7 +13,7 @@ class Inventory:
         # Kita perlu membuat instance Fish dari data ini
         from fish import Fish # Impor di sini untuk menghindari circular dependency
         # Posisi dummy (0,0) karena ikan di inventaris tidak dirender di dunia
-        new_fish = Fish(fish_data, (0,0)) 
+        new_fish = Fish(fish_data, (0,0), self.game.config) # <--- PERBAIKAN: Tambahkan self.game.config
         self.fish_list.append(new_fish)
 
     def get_summary(self):
