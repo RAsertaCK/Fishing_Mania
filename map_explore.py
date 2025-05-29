@@ -161,10 +161,10 @@ class MapExplorer:
 
         print(f"--- MapExplorer: Fishing spots data (setelah penyesuaian): {self.fishing_spots_data} ---")
         
-        self.sea_limit_right = self.config.SCREEN_WIDTH * 0.95 
-        self.sea_limit_bottom = self.config.SCREEN_HEIGHT * 0.95
-        self.sea_limit_left = self.config.SCREEN_WIDTH * 0.01  
-        self.sea_limit_top = self.config.SCREEN_HEIGHT * 0.01   
+        self.sea_limit_right = self.config.SCREEN_WIDTH * 0.90 
+        self.sea_limit_bottom = self.config.SCREEN_HEIGHT * 0.90
+        self.sea_limit_left = self.config.SCREEN_WIDTH * 0.10  
+        self.sea_limit_top = self.config.SCREEN_HEIGHT * 0.10   
         print(f"--- MapExplorer: Batas laut diatur ke L:{self.sea_limit_left}, T:{self.sea_limit_top}, R:{self.sea_limit_right}, B:{self.sea_limit_bottom} ---")
 
         print("--- MapExplorer: __init__() selesai. ---")

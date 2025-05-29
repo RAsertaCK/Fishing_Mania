@@ -53,7 +53,7 @@ class LandExplorer:
 
         self.land_background_image = None
         self.land_background_rect = None
-        background_path = os.path.join(self.config.BACKGROUND_PATH, "TESTING.png")
+        background_path = os.path.join(self.config.BACKGROUND_PATH, "bg_baru.webp")
         try:
             if not os.path.exists(background_path):
                 print(f"--- LandExplorer: PERINGATAN - File latar daratan '{background_path}' TIDAK DITEMUKAN. Menggunakan warna solid.")
@@ -72,11 +72,14 @@ class LandExplorer:
                     self.land_background_image.fill((255, 0, 255))
                     self.land_background_rect = self.land_background_image.get_rect(topleft=(0,0))
                 else:
-                    self.land_background_image = loaded_bg_image
+                    # --- MODIFIKASI DIMULAI DI SINI ---
+                    # Skalakan gambar latar belakang agar pas dengan SCREEN_WIDTH dan SCREEN_HEIGHT
+                    self.land_background_image = pygame.transform.scale(loaded_bg_image, (self.config.SCREEN_WIDTH, self.config.SCREEN_HEIGHT))
                     self.world_width = self.land_background_image.get_width()
                     self.world_height = self.land_background_image.get_height()
                     self.land_background_rect = self.land_background_image.get_rect(topleft=(0,0))
-                    print(f"--- LandExplorer: Latar daratan '{background_path}' dimuat. Ukuran dunia: {self.world_width}x{self.world_height}")
+                    print(f"--- LandExplorer: Latar daratan '{background_path}' dimuat dan diskalakan ke layar {self.world_width}x{self.world_height}.")
+                    # --- MODIFIKASI BERAKHIR DI SINI ---
 
         except Exception as e:
             print(f"--- LandExplorer: ERROR tidak bisa memuat gambar latar daratan '{background_path}': {e}. Menggunakan warna solid. ---")
@@ -89,10 +92,14 @@ class LandExplorer:
         self.player = self.game.land_player
 
         # === PENYESUAIAN BATAS DARATAN ===
-        land_rect_left_abs = int(self.world_width * 0.19)
-        land_rect_top_abs = int(self.world_height * 0.10)
-        land_rect_right_abs = int(self.world_width * 0.84)
-        land_rect_bottom_abs = int(self.world_height * 0.86)
+        # Jika Anda menskalakan background agar pas dengan layar,
+        # maka batas daratan juga perlu disesuaikan dengan ukuran layar.
+        # Atau, jika Anda ingin tetap menggunakan proporsi asli,
+        # proporsi ini akan diterapkan pada SCREEN_WIDTH dan SCREEN_HEIGHT.
+        land_rect_left_abs = int(self.config.SCREEN_WIDTH * 0.19) # Mengacu ke SCREEN_WIDTH
+        land_rect_top_abs = int(self.config.SCREEN_HEIGHT * 0.10) # Mengacu ke SCREEN_HEIGHT
+        land_rect_right_abs = int(self.config.SCREEN_WIDTH * 0.84) # Mengacu ke SCREEN_WIDTH
+        land_rect_bottom_abs = int(self.config.SCREEN_HEIGHT * 0.86) # Mengacu ke SCREEN_HEIGHT
 
         land_rect_width_abs = land_rect_right_abs - land_rect_left_abs
         land_rect_height_abs = land_rect_bottom_abs - land_rect_top_abs
@@ -106,11 +113,12 @@ class LandExplorer:
         print(f"--- LandExplorer: Batas daratan diatur ke Rect: {self.land_bounds_rect} ---")
         
         # Interactive Objects on Land
-        rumah_pos_x = self.world_width * 0.60
-        rumah_pos_y = self.world_height * 0.45
+        # Posisi objek interaktif juga perlu disesuaikan dengan SCREEN_WIDTH/HEIGHT
+        rumah_pos_x = self.config.SCREEN_WIDTH * 0.50
+        rumah_pos_y = self.config.SCREEN_HEIGHT * 0.48
         
-        kapal_pos_x = self.world_width * 0.70
-        kapal_pos_y = self.world_height * 0.83
+        kapal_pos_x = self.config.SCREEN_WIDTH * 0.60
+        kapal_pos_y = self.config.SCREEN_HEIGHT * 0.83
 
         self.interactive_objects = {
             "Rumah": {'pos': (rumah_pos_x, rumah_pos_y), 'rect_area': pygame.Rect(0,0,170,140), 'action': self.go_to_main_menu, 'label': "Rumah" },
@@ -122,6 +130,7 @@ class LandExplorer:
         self.active_object_data = None
         self.interaction_prompt = ""
 
+        # Camera kini akan menggunakan world_width dan world_height yang sama dengan screen_width/height
         self.camera = Camera(self.world_width, self.world_height, self.config.SCREEN_WIDTH, self.config.SCREEN_HEIGHT)
         
         # --- PERBAIKAN DI SINI: Atur posisi awal pemain darat di tengah area daratan ---
@@ -188,9 +197,9 @@ class LandExplorer:
                     self.active_object_data = data
                     if data['action']:
                         if name == "Kapal":
-                            current_prompt = "Tekan ENTER untuk Berlayar"
+                            current_prompt = "OTW  Mancing"
                         elif name == "Rumah":
-                            current_prompt = "Tekan ENTER untuk Masuk Rumah"
+                            current_prompt = "Masuk Rumah Mase"
                     break
             self.interaction_prompt = current_prompt
         else:
@@ -199,7 +208,8 @@ class LandExplorer:
     def render(self, screen):
         # Menggambar latar belakang daratan (gambar utama)
         if self.land_background_image and self.land_background_rect:
-            screen.blit(self.land_background_image, self.camera.apply(self.land_background_rect))
+            # Karena background sudah diskalakan ke ukuran layar, tidak perlu kamera.apply untuk background statis
+            screen.blit(self.land_background_image, (0,0))
         else:
             screen.fill(self.config.COLORS.get("magenta", (255,0,255)))
         
