@@ -6,11 +6,11 @@ class MapExplorer:
     def __init__(self, game):
         print("--- MapExplorer: Memulai __init__()... ---")
         self.game = game
-        self.config = self.game.config  # Mengambil config dari game
+        self.config = self.game.config # Mengambil config dari game
 
         # Load Font
         font_name_to_load = None
-        small_font_size = 20  # Default
+        small_font_size = 20 # Default
 
         if hasattr(self.config, 'DEFAULT_FONT_NAME'):
             font_name_to_load = self.config.DEFAULT_FONT_NAME
@@ -21,7 +21,7 @@ class MapExplorer:
         if font_name_to_load and font_name_to_load.strip() != "" and font_name_to_load.lower() != 'none':
             if os.path.isabs(font_name_to_load) and os.path.exists(font_name_to_load):
                 actual_font_path = font_name_to_load
-            elif hasattr(self.config, 'FONT_PATH'):  # Pastikan FONT_PATH ada di config
+            elif hasattr(self.config, 'FONT_PATH'): # Pastikan FONT_PATH ada di config
                 potential_path = os.path.join(self.config.FONT_PATH, font_name_to_load)
                 if os.path.exists(potential_path):
                     actual_font_path = potential_path
@@ -39,6 +39,7 @@ class MapExplorer:
         except Exception as e:
             print(f"--- MapExplorer: ERROR saat memuat font: {e}. Menggunakan default pygame.font.Font(None, 24). ---")
             self.font = pygame.font.Font(None, 24)
+
 
         # Load World Map Background
         self.world_map_image = None
@@ -59,7 +60,7 @@ class MapExplorer:
 
                     if is_placeholder_from_load_image:
                          print(f"--- MapExplorer: PERINGATAN - load_image untuk '{world_map_path}' mengembalikan placeholder. Akan menggunakan warna solid.")
-                    else:
+                    else: 
                         self.world_map_image = loaded_map_image
                         self.world_map_rect = self.world_map_image.get_rect(topleft=(0,0))
                         print(f"--- MapExplorer: Gambar peta dunia '{world_map_path}' dimuat. Ukuran asli: {self.world_map_image.get_size()} ---")
@@ -82,9 +83,9 @@ class MapExplorer:
 
         # Player (Boat) Initialization
         self.player_world_pos = [self.config.SCREEN_WIDTH * 0.6, self.config.SCREEN_HEIGHT * 0.65]
-        self.player_speed = 200  # Kecepatan pemain di peta
+        self.player_speed = 200 # Kecepatan pemain di peta
         self.player_boat_image = None
-        self.player_map_rect = None  # Ini akan menjadi rect untuk kapal di peta
+        self.player_map_rect = None # Ini akan menjadi rect untuk kapal di peta
         player_boat_image_path = ""
 
         # --- PERBAIKAN: Gunakan self.config.ASSETS_PATH ---
@@ -122,29 +123,26 @@ class MapExplorer:
 
         spot_interaction_width, spot_interaction_height = 200, 80
         self.fishing_spots_data = {
-            "Pantai Lokal": {
-                'pos': (self.config.SCREEN_WIDTH * 0.55, self.config.SCREEN_HEIGHT * 0.6),
-                'rect_area': pygame.Rect(0, 0, spot_interaction_width, spot_interaction_height),
+            "Pantai Lokal": { 
+                'pos': (self.config.SCREEN_WIDTH * 0.55, self.config.SCREEN_HEIGHT * 0.6), 
+                'rect_area': pygame.Rect(0,0, spot_interaction_width, spot_interaction_height),
                 'map_name': "Coast",
-                'unlock_cost': 0,  # Gratis
-                'display_name': "Pantai Lokal",
-                'is_unlocked': True  # Pantai Lokal selalu terbuka
+                'unlock_cost': 0, # Gratis
+                'display_name': "Pantai Lokal" 
             },
-            "Laut Lepas": {
-                'pos': (self.config.SCREEN_WIDTH * 0.30, self.config.SCREEN_HEIGHT * 0.40),
-                'rect_area': pygame.Rect(0, 0, spot_interaction_width, spot_interaction_height),
+            "Laut Lepas": { 
+                'pos': (self.config.SCREEN_WIDTH * 0.30, self.config.SCREEN_HEIGHT * 0.40), 
+                'rect_area': pygame.Rect(0,0, spot_interaction_width, spot_interaction_height),
                 'map_name': "Sea",
-                'unlock_cost': 800,  # Biaya untuk Laut Lepas
-                'display_name': "Laut Lepas",
-                'is_unlocked': False  # Awalnya terkunci
+                'unlock_cost': 800, # Biaya untuk Laut Lepas
+                'display_name': "Laut Lepas" 
             },
-            "Samudra Dalam": {
-                'pos': (self.config.SCREEN_WIDTH * 0.12, self.config.SCREEN_HEIGHT * 0.15),
-                'rect_area': pygame.Rect(0, 0, spot_interaction_width, spot_interaction_height),
+            "Samudra Dalam": { 
+                'pos': (self.config.SCREEN_WIDTH * 0.12, self.config.SCREEN_HEIGHT * 0.15), 
+                'rect_area': pygame.Rect(0,0, spot_interaction_width, spot_interaction_height),
                 'map_name': "Ocean",
-                'unlock_cost': 3500,  # Biaya untuk Samudra Dalam
-                'display_name': "Samudra Dalam",
-                'is_unlocked': False  # Awalnya terkunci
+                'unlock_cost': 3500, # Biaya untuk Samudra Dalam
+                'display_name': "Samudra Dalam" 
             },
         }
         for spot_name, data in self.fishing_spots_data.items():
@@ -152,7 +150,7 @@ class MapExplorer:
 
         self.land_return_spot_data = {
             'pos': (self.config.SCREEN_WIDTH * 0.85, self.config.SCREEN_HEIGHT * 0.85),
-            'rect_area': pygame.Rect(0, 0, 200, 80),
+            'rect_area': pygame.Rect(0,0, 200, 80),
             'label': "Kembali ke Daratan",
             'target_state': 'land_explore'
         }
@@ -165,10 +163,10 @@ class MapExplorer:
 
         print(f"--- MapExplorer: Fishing spots data (setelah penyesuaian): {self.fishing_spots_data} ---")
         
-        self.sea_limit_right = self.config.SCREEN_WIDTH * 0.95
+        self.sea_limit_right = self.config.SCREEN_WIDTH * 0.95 
         self.sea_limit_bottom = self.config.SCREEN_HEIGHT * 0.95
-        self.sea_limit_left = self.config.SCREEN_WIDTH * 0.01
-        self.sea_limit_top = self.config.SCREEN_HEIGHT * 0.01
+        self.sea_limit_left = self.config.SCREEN_WIDTH * 0.01  
+        self.sea_limit_top = self.config.SCREEN_HEIGHT * 0.01   
         print(f"--- MapExplorer: Batas laut diatur ke L:{self.sea_limit_left}, T:{self.sea_limit_top}, R:{self.sea_limit_right}, B:{self.sea_limit_bottom} ---")
 
         print("--- MapExplorer: __init__() selesai. ---")
@@ -177,177 +175,180 @@ class MapExplorer:
         print(f"--- MapExplorer: setup_scene() dipanggil ---")
         pass
 
+
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                 if self.active_target_state_name:
-                    # Logika untuk kembali ke daratan (tidak perlu biaya)
                     if self.active_target_state_name == 'land_explore':
                         print(f"--- MapExplorer: Pemain memilih untuk kembali ke daratan. ---")
                         self.game.change_state('land_explore')
                         return True
-                    # Logika untuk masuk ke lokasi memancing (perlu cek biaya dan status terkunci)
                     elif self.active_target_state_name in ["Coast", "Sea", "Ocean"]:
                         selected_spot_data = None
-                        # Cari data spot berdasarkan map_name yang aktif
                         for name, sd in self.fishing_spots_data.items():
                             if sd.get('map_name') == self.active_target_state_name:
                                 selected_spot_data = sd
                                 break
                         
                         if selected_spot_data:
-                            if selected_spot_data['is_unlocked']:
-                                # Lokasi sudah terbuka
+                            unlock_cost = selected_spot_data.get('unlock_cost', 0)
+                            map_name = selected_spot_data['map_name']
+                            display_name = selected_spot_data['display_name']
+
+                            # --- Cek status wilayah ---
+                            is_unlocked = self.game.unlocked_locations.get(map_name, False) # Ambil status dari game.py
+
+                            if is_unlocked:
                                 print(f"--- MapExplorer: Pemain memilih lokasi memancing: {self.active_target_state_name} ---")
                                 self.game.change_state('fishing', data={'location_name': self.active_target_state_name})
-                                self.locked_spot_message = None  # Reset pesan setelah berhasil masuk
+                                self.locked_spot_message = None # Reset pesan
                                 return True
+                            elif self.game.wallet >= unlock_cost:
+                                # Wilayah terkunci tapi koin cukup, lakukan pembelian
+                                self.game.wallet -= unlock_cost
+                                self.game.unlocked_locations[map_name] = True # Tandai sebagai terbuka permanen
+                                print(f"--- MapExplorer: {display_name} berhasil dibuka! Koin berkurang {unlock_cost}. Sisa koin: {self.game.wallet} ---")
+                                self.locked_spot_message = None # Reset pesan
+                                # Jangan langsung masuk ke state fishing, biarkan pemain melihat update UI dan tekan ENTER lagi
+                                return True 
                             else:
-                                unlock_cost = selected_spot_data.get('unlock_cost', 0)
-                                # Cek apakah pemain punya cukup koin
-                                if self.game.wallet >= unlock_cost:
-                                    # Kurangi koin dan tandai lokasi sebagai terbuka
-                                    self.game.wallet -= unlock_cost
-                                    selected_spot_data['is_unlocked'] = True
-                                    print(f"--- MapExplorer: {selected_spot_data['display_name']} terbuka! Koin berkurang {unlock_cost}. Sisa koin: {self.game.wallet} ---")
-                                    self.game.change_state('fishing', data={'location_name': self.active_target_state_name})
-                                    self.locked_spot_message = None
-                                    return True
-                                else:
-                                    # Tidak cukup koin
-                                    self.locked_spot_message = f"Tidak cukup koin! Butuh {unlock_cost} untuk {selected_spot_data['display_name']}."
-                                    print(self.locked_spot_message)
-                                    return True
+                                # Wilayah terkunci dan koin tidak cukup
+                                self.locked_spot_message = f"Tidak cukup koin! Butuh {unlock_cost} untuk {display_name}." 
+                                print(self.locked_spot_message)
+                                return True 
         
             elif event.key == pygame.K_ESCAPE:
                  print("--- MapExplorer: Tombol ESC ditekan, kembali ke land_explore ---")
                  self.game.change_state('land_explore')
                  return True
-        return False  # Event tidak ditangani oleh menu ini
+        return False
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
         move_x, move_y = 0, 0
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            move_x -= self.player_speed * dt
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            move_x += self.player_speed * dt
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            move_y -= self.player_speed * dt
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            move_y += self.player_speed * dt
+        if keys[pygame.K_LEFT]: 
+            move_x -= self.player_speed * dt 
+        if keys[pygame.K_RIGHT]: 
+            move_x += self.player_speed * dt 
+        if keys[pygame.K_UP]: 
+            move_y -= self.player_speed * dt 
+        if keys[pygame.K_DOWN]: 
+            move_y += self.player_speed * dt 
 
-        if self.player_map_rect:
-            self.player_map_rect.x += move_x
-            self.player_map_rect.y += move_y
+        if self.player_map_rect: 
+            self.player_map_rect.x += move_x 
+            self.player_map_rect.y += move_y 
 
-            if self.player_map_rect.left < self.sea_limit_left:
-                self.player_map_rect.left = self.sea_limit_left
-            if self.player_map_rect.top < self.sea_limit_top:
-                self.player_map_rect.top = self.sea_limit_top
-            if self.player_map_rect.right > self.sea_limit_right:
-                self.player_map_rect.right = self.sea_limit_right
-            if self.player_map_rect.bottom > self.sea_limit_bottom:
-                self.player_map_rect.bottom = self.sea_limit_bottom
+            if self.player_map_rect.left < self.sea_limit_left: 
+                self.player_map_rect.left = self.sea_limit_left 
+            if self.player_map_rect.top < self.sea_limit_top: 
+                self.player_map_rect.top = self.sea_limit_top 
+            if self.player_map_rect.right > self.sea_limit_right: 
+                self.player_map_rect.right = self.sea_limit_right 
+            if self.player_map_rect.bottom > self.sea_limit_bottom: 
+                self.player_map_rect.bottom = self.sea_limit_bottom 
             
-            if self.world_map_rect:
-                self.player_map_rect.clamp_ip(self.world_map_rect)
+            if self.world_map_rect: 
+                self.player_map_rect.clamp_ip(self.world_map_rect) 
             
-            self.active_target_state_name = None
-            self.active_prompt_text = None
-            self.locked_spot_message = None  # Reset pesan setiap update untuk membersihkan jika pemain menjauh
+            self.active_target_state_name = None 
+            self.active_prompt_text = None 
+            self.locked_spot_message = None # Reset pesan setiap update untuk membersihkan jika pemain menjauh
 
-            for display_name_key, spot_data in self.fishing_spots_data.items():
-                if self.player_map_rect.colliderect(spot_data['rect_area']):
-                    self.active_target_state_name = spot_data['map_name']
-                    self.active_spot_map_name = spot_data['map_name']
+            for display_name_key, spot_data in self.fishing_spots_data.items(): 
+                if self.player_map_rect.colliderect(spot_data['rect_area']): 
+                    map_name = spot_data['map_name']
+                    unlock_cost = spot_data.get('unlock_cost', 0)
+                    display_name_for_prompt = spot_data.get('display_name', display_name_key) 
+
+                    # --- Logika UI untuk wilayah terkunci/terbuka/bisa dibeli ---
+                    is_unlocked = self.game.unlocked_locations.get(map_name, False)
+
+                    self.active_target_state_name = map_name # Tetapkan target state
                     
-                    display_name_for_prompt = spot_data.get('display_name', display_name_key)
-                    
-                    if not spot_data['is_unlocked']:
-                        # Lokasi terkunci
-                        self.active_prompt_text = f"Terkunci! Butuh {spot_data['unlock_cost']} Koin"
-                        self.locked_spot_message = f"Tidak cukup koin! Butuh {spot_data['unlock_cost']} untuk {display_name_for_prompt}."
+                    if is_unlocked:
+                        self.active_prompt_text = f"Tekan ENTER untuk memancing di {display_name_for_prompt}"
+                    elif self.game.wallet >= unlock_cost:
+                        self.active_prompt_text = f"Tekan ENTER untuk membuka {display_name_for_prompt} ({unlock_cost} Koin)"
                     else:
-                        # Lokasi terbuka
-                        self.active_prompt_text = f"memancing di {display_name_for_prompt}"
-                        # Tidak perlu lagi menampilkan biaya di prompt karena sudah dibeli
-                    break
+                        self.active_prompt_text = f"Terkunci! Butuh {unlock_cost} Koin"
+                        self.locked_spot_message = f"Tidak cukup koin! Butuh {unlock_cost} untuk {display_name_for_prompt}."
+                    
+                    break # Keluar dari loop setelah menemukan spot aktif
 
-            if not self.active_target_state_name:
-                if self.player_map_rect.colliderect(self.land_return_spot_data['rect_area']):
-                    self.active_target_state_name = self.land_return_spot_data['target_state']
-                    self.active_prompt_text = f"{self.land_return_spot_data['label']}"
+            if not self.active_target_state_name: 
+                if self.player_map_rect.colliderect(self.land_return_spot_data['rect_area']): 
+                    self.active_target_state_name = self.land_return_spot_data['target_state'] 
+                    self.active_prompt_text = f"{self.land_return_spot_data['label']}" 
         else:
             pass
 
+
     def render(self, screen):
-        if self.world_map_image and self.world_map_rect:
-            screen.blit(self.world_map_image, self.world_map_rect.topleft)
+        if self.world_map_image and self.world_map_rect: 
+            screen.blit(self.world_map_image, self.world_map_rect.topleft) 
         
         # Render Fishing Spots (label teks)
-        for display_name_key, spot_data in self.fishing_spots_data.items():
-            is_active = (spot_data['map_name'] == self.active_target_state_name)
+        for display_name_key, spot_data in self.fishing_spots_data.items(): 
+            is_active = (spot_data['map_name'] == self.active_target_state_name) 
             
             # Perbarui warna dan teks berdasarkan status terkunci
-            is_locked = not spot_data['is_unlocked']
-            
-            color_key = 'text_selected' if is_active and not is_locked else 'text_default'
-            if is_locked:
-                color_key = 'text_inactive'
-            
-            # Pastikan config dan COLORS ada sebelum mengakses
-            default_color_val = (255, 255, 0) if is_active else (255, 255, 255)
-            if is_locked:
-                default_color_val = self.config.COLORS.get('red', (255, 100, 100))
-            
-            color_val = default_color_val
-            if hasattr(self.config, 'COLORS'):
-                 color_val = self.config.COLORS.get(color_key, default_color_val)
-            
-            spot_label_text = spot_data.get('display_name', display_name_key)
-            if is_locked:
-                spot_label_text += f" (Terkunci: {spot_data['unlock_cost']} Koin)"
+            unlock_cost = spot_data.get('unlock_cost', 0)
+            map_name = spot_data['map_name']
+            is_unlocked = self.game.unlocked_locations.get(map_name, False) # Ambil status dari game.py
 
-            spot_label = self.font.render(spot_label_text, True, color_val)
+            color_key = 'text_default' # Default color
+            spot_label_text = spot_data.get('display_name', display_name_key) # Ambil display_name dari data
+
+            if is_unlocked:
+                color_key = 'text_selected' if is_active else 'text_default' # Kuning jika aktif, putih jika tidak
+            elif self.game.wallet >= unlock_cost:
+                color_key = 'text_selected' if is_active else 'legendary' # Kuning untuk aktif, emas/legendary jika bisa dibeli
+                spot_label_text += f" (Beli: {unlock_cost} Koin)"
+            else:
+                color_key = 'text_inactive' # Warna abu-abu atau merah untuk terkunci
+                spot_label_text += f" (Terkunci: {unlock_cost} Koin)"
+            
+            color_val = self.config.COLORS.get(color_key, (255,255,255)) # Default fallback
+            
+            spot_label = self.font.render(spot_label_text, True, color_val) 
             # Posisi label relatif terhadap layar, bukan dunia game jika peta tidak scroll
-            label_rect = spot_label.get_rect(center=spot_data['pos'])
-            screen.blit(spot_label, label_rect)
+            label_rect = spot_label.get_rect(center=spot_data['pos']) 
+            screen.blit(spot_label, label_rect) 
 
         # Render Titik Kembali ke Daratan
-        is_land_spot_active = (self.land_return_spot_data['target_state'] == self.active_target_state_name)
-        land_color_key = 'text_selected' if is_land_spot_active else 'text_default'
-        land_default_color_val = (255, 255, 0) if is_land_spot_active else (255, 255, 255)
-        land_color_val = land_default_color_val
-        if hasattr(self.config, 'COLORS'):
-            land_color_val = self.config.COLORS.get(land_color_key, land_default_color_val)
+        is_land_spot_active = (self.land_return_spot_data['target_state'] == self.active_target_state_name) 
+        land_color_key = 'text_selected' if is_land_spot_active else 'text_default' 
+        land_default_color_val = (255,255,0) if is_land_spot_active else (255,255,255) 
+        land_color_val = land_default_color_val 
+        if hasattr(self.config, 'COLORS'): 
+            land_color_val = self.config.COLORS.get(land_color_key, land_default_color_val) 
 
-        land_label_surface = self.font.render(self.land_return_spot_data['label'], True, land_color_val)
-        land_label_rect = land_label_surface.get_rect(center=self.land_return_spot_data['pos'])
-        screen.blit(land_label_surface, land_label_rect)
+        land_label_surface = self.font.render(self.land_return_spot_data['label'], True, land_color_val) 
+        land_label_rect = land_label_surface.get_rect(center=self.land_return_spot_data['pos']) 
+        screen.blit(land_label_surface, land_label_rect) 
 
         # Render Player (kapal di peta)
-        if self.player_boat_image and self.player_map_rect:
-            screen.blit(self.player_boat_image, self.player_map_rect)
-        elif self.player_map_rect:
-            player_color_val = (255, 0, 0)
-            if hasattr(self.config, 'COLORS'):
-                 player_color_val = self.config.COLORS.get("player_map_avatar", (255, 0, 0))
-            pygame.draw.rect(screen, player_color_val, self.player_map_rect)
+        if self.player_boat_image and self.player_map_rect: 
+            screen.blit(self.player_boat_image, self.player_map_rect) 
+        elif self.player_map_rect: 
+            player_color_val = (255,0,0) 
+            if hasattr(self.config, 'COLORS'): 
+                 player_color_val = self.config.COLORS.get("player_map_avatar", (255,0,0)) 
+            pygame.draw.rect(screen, player_color_val, self.player_map_rect) 
 
         # --- Tampilkan Informasi Kapal dan Inventaris di Map (Kanan Atas) ---
         if self.game.boat and self.game.inventory:
-            info_start_x = self.config.SCREEN_WIDTH - 10  # Offset dari tepi kanan
-            info_start_y = 10  # Offset dari tepi atas (di bawah koin/lokasi dari UI global)
+            info_start_x = self.config.SCREEN_WIDTH - 10 
+            info_start_y = 10 
             line_height = self.font.get_height() + 5
 
-            # Kecepatan Kapal
             speed_text = f"Kecepatan: {int(self.game.boat.current_speed_value)}"
             speed_surface = self.font.render(speed_text, True, self.config.COLORS.get('white'))
-            speed_rect = speed_surface.get_rect(topright=(info_start_x, info_start_y + (self.game.ui.font.get_height() * 2) + 10))  # Offset di bawah koin/lokasi
+            speed_rect = speed_surface.get_rect(topright=(info_start_x, info_start_y + (self.game.ui.font.get_height() * 2) + 10)) 
             screen.blit(speed_surface, speed_rect)
 
-            # Kapasitas Ikan (Saat Ini / Maksimal)
             current_fish_count = len(self.game.inventory.fish_list)
             max_capacity = self.game.boat.current_capacity_value
             capacity_text = f"Ikan: {current_fish_count}/{max_capacity}"
@@ -355,25 +356,23 @@ class MapExplorer:
             capacity_rect = capacity_surface.get_rect(topright=(info_start_x, speed_rect.bottom + 5))
             screen.blit(capacity_surface, capacity_rect)
 
-            # Panjang Kail (Max Hook Depth)
-            # Karena ini adalah Max Kail, kita ambil dari current_line_length_value kapal
             line_length_text = f"Panjang Kail: {int(self.game.boat.current_line_length_value)}m"
             line_length_surface = self.font.render(line_length_text, True, self.config.COLORS.get('white'))
             line_length_rect = line_length_surface.get_rect(topright=(info_start_x, capacity_rect.bottom + 5))
             screen.blit(line_length_surface, line_length_rect)
-        # --- END Informasi Kapal dan Inventaris ---
 
-        if self.active_prompt_text:
-            interaction_text_str = f"Tekan ENTER untuk {self.active_prompt_text}"
-            text_color_val = (255, 255, 255)
+        if self.active_prompt_text: 
+            interaction_text_str = self.active_prompt_text # Gunakan langsung active_prompt_text
+            text_color_val = self.config.COLORS.get("white",(255,255,255)) 
             
-            # Jika ada pesan terkunci, gunakan warna berbeda dan tambahkan ke prompt
+            # Jika ada pesan terkunci dari handle_event (koin tidak cukup), prioritaskan itu
             if self.locked_spot_message:
                 interaction_text_str = self.locked_spot_message
-                text_color_val = self.config.COLORS.get('red', (255, 100, 100))
-            elif hasattr(self.config, 'COLORS'):
-                text_color_val = self.config.COLORS.get("white", (255, 255, 255))
+                text_color_val = self.config.COLORS.get('red', (255,100,100)) 
+            # Jika itu pesan "Tekan ENTER untuk membeli", warnanya bisa kuning
+            elif "untuk membuka" in self.active_prompt_text:
+                 text_color_val = self.config.COLORS.get('text_selected', (255,255,0)) 
 
-            interaction_text_surface = self.font.render(interaction_text_str, True, text_color_val)
-            text_rect = interaction_text_surface.get_rect(midbottom=(self.config.SCREEN_WIDTH // 2, self.config.SCREEN_HEIGHT - 20))
+            interaction_text_surface = self.font.render(interaction_text_str, True, text_color_val) 
+            text_rect = interaction_text_surface.get_rect(midbottom=(self.config.SCREEN_WIDTH // 2, self.config.SCREEN_HEIGHT - 20)) 
             screen.blit(interaction_text_surface, text_rect)

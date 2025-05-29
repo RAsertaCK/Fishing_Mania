@@ -45,8 +45,8 @@ class Game:
         except Exception as e:
             print(f"--- Game: ERROR debug font: {e}. ---"); self.debug_font = pygame.font.Font(None, 24)
 
-        self.current_state_name = 'main_menu'; self.wallet = 760
-        self.inventory = Inventory(self) # <--- SUDAH BENAR
+        self.current_state_name = 'main_menu'; self.wallet = 100
+        self.inventory = Inventory(self)
         self.market = Market(self)
         class InitialDummyMap:
             def __init__(self): self.name = "initial"; self.data = {'depth_range': (10,100)}; self.background_image = pygame.Surface((Config.SCREEN_WIDTH,Config.SCREEN_HEIGHT)); self.background_image.fill((0,0,50)) #
@@ -76,6 +76,13 @@ class Game:
         self.visible_fish_sprites=pygame.sprite.Group()
         self.ui=UI(self); print("--- Game: Game.__init__() selesai. ---")
 
+        # --- BARU: Menyimpan status lokasi yang sudah dibuka ---
+        # Awalnya hanya Pantai Lokal yang terbuka
+        self.unlocked_locations = {
+            "Coast": True,
+            "Sea": False,
+            "Ocean": False
+        }
 
     def change_state(self, new_state_name, data=None):
         print(f"--- Game: State: {self.current_state_name} -> {new_state_name} ---")
@@ -154,16 +161,16 @@ class Game:
 
     def spawn_visible_fish(self, amount=5):
         # ... (Sama seperti sebelumnya) ...
-        if not self.current_game_map or not self.fishing_camera: return #
+        if not self.current_game_map or not self.fishing_camera: return 
         if not hasattr(self, 'water_top_y_world') or not hasattr(self, 'water_bottom_y_world') or \
-           self.water_top_y_world >= self.water_bottom_y_world: return
-        from fish import Fish #
-        for _ in range(amount):
-            fish_data = self.current_game_map.get_random_fish_data() #
-            if fish_data:
-                spawn_x = random.randint(self.fishing_world_rect.left + 20, self.fishing_world_rect.right - 20)
-                spawn_y = random.randint(int(self.water_top_y_world), int(self.water_bottom_y_world))
-                self.visible_fish_sprites.add(Fish(fish_data, (spawn_x, spawn_y), self.config)) # <--- Pastikan ini juga meneruskan self.config
+           self.water_top_y_world >= self.water_bottom_y_world: return 
+        from fish import Fish 
+        for _ in range(amount): 
+            fish_data = self.current_game_map.get_random_fish_data() 
+            if fish_data: 
+                spawn_x = random.randint(self.fishing_world_rect.left + 20, self.fishing_world_rect.right - 20) 
+                spawn_y = random.randint(int(self.water_top_y_world), int(self.water_bottom_y_world)) 
+                self.visible_fish_sprites.add(Fish(fish_data, (spawn_x, spawn_y), self.config)) 
 
     def play_music_file(self, music_path, loop=-1):
         # ... (Sama seperti sebelumnya) ...
@@ -295,7 +302,7 @@ class Game:
                     if fish_sprite.image and fish_sprite.rect:
                         # PERBAIKAN MOONWALK: Asumsi sprite ikan asli menghadap KIRI.
                         # Jika sprite asli menghadap KANAN, ubah 'fish_sprite.swim_direction > 0' menjadi 'fish_sprite.swim_direction < 0'
-                        img_to_render = pygame.transform.flip(fish_sprite.image, fish_sprite.swim_direction > 0, False) # <--- PERBAIKAN MOONWALK
+                        img_to_render = pygame.transform.flip(fish_sprite.image, fish_sprite.swim_direction > 0, False) #
                         self.screen.blit(img_to_render, self.fishing_camera.apply(fish_sprite.rect)) #
             if self.boat and hasattr(self.boat, 'render_with_camera') and self.fishing_camera: #
                  self.boat.render_with_camera(self.screen, self.fishing_camera) #
@@ -325,6 +332,3 @@ class Game:
                 afs = self.debug_font.render(active_fish_info, True, self.config.COLORS.get('white')); self.screen.blit(afs, (self.config.SCREEN_WIDTH - afs.get_width() - 10, 10)) #
 
         pygame.display.flip()
-
-    def quit_game(self):
-        print("--- Game: Menutup game (quit_game dipanggil)... ---"); pygame.quit(); sys.exit()
