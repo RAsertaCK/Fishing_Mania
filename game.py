@@ -45,7 +45,7 @@ class Game:
         except Exception as e:
             print(f"--- Game: ERROR debug font: {e}. ---"); self.debug_font = pygame.font.Font(None, 24)
 
-        self.current_state_name = 'main_menu'; self.wallet = 100
+        self.current_state_name = 'main_menu'; self.wallet = 760
         self.inventory = Inventory(self) # <--- SUDAH BENAR
         self.market = Market(self)
         class InitialDummyMap:

@@ -146,7 +146,8 @@ class MainMenu(Menu):
         self.options = [
             # Aksi "Mulai Petualangan" sekarang ke 'land_explore'
             ("Mulai Petualangan", lambda: self.game.change_state('land_explore')), 
-            ("Pengaturan", lambda: self.game.change_state('settings')),
+            # HAPUS BARIS INI UNTUK MENGHAPUS PENGATURAN
+            # ("Pengaturan", lambda: self.game.change_state('settings')),
             ("Toko Perahu", lambda: self.game.change_state('shop')),
             ("Lihat Koleksi Ikan", lambda: self.game.change_state('inventory_screen')),
             ("Jual Ikan", lambda: self.game.change_state('market_screen')),
@@ -158,6 +159,9 @@ class MainMenu(Menu):
         self.game.running = False
 
 class SettingsMenu(Menu):
+    # KARENA OPSI PENGATURAN DIHAPUS, KELAS INI MUNGKIN TIDAK DIPERLUKAN LAGI
+    # TAPI KITA BISA BIARKAN UNTUK SAAT INI JIKA MUNGKIN ADA REFERENSI LAIN.
+    # Jika Anda ingin menghapus sepenuhnya, pastikan untuk menghapus inisialisasi SettingsMenu di game.py
     def __init__(self, game):
         super().__init__(game, background_image_filename="TampilanAwal.png")
         self.title = "Pengaturan"
@@ -177,17 +181,22 @@ class ShopMenu(Menu):
              return
 
         options_list = []
-        upgrade_types = ["speed", "capacity", "sonar"]
+        # Perbarui upgrade_types untuk menyertakan 'line_length' dan menghapus 'sonar'
+        upgrade_types = ["speed", "capacity", "line_length"] 
         for upgrade_type in upgrade_types:
             cost = self.game.boat.get_upgrade_cost(upgrade_type) if hasattr(self.game.boat, 'get_upgrade_cost') else "N/A"
             current_level = self.game.boat.upgrades.get(upgrade_type, 0) if hasattr(self.game.boat, 'upgrades') else 0
             max_level_boat = len(self.game.boat.UPGRADE_LEVELS.get(upgrade_type, [])) -1 
 
+            display_name = upgrade_type.capitalize()
+            if upgrade_type == "line_length": 
+                display_name = "Panjang Tali Pancing"
+
             if cost != "N/A" and cost is not None and current_level < max_level_boat : 
-                text = f"Upgrade {upgrade_type.capitalize()} (Lvl {current_level+1}) - Koin: {cost}"
+                text = f"Upgrade {display_name} (Lvl {current_level+1}) - Koin: {cost}" 
                 action = lambda ut=upgrade_type: self.attempt_upgrade(ut)
             else: 
-                text = f"{upgrade_type.capitalize()} (Lvl {current_level if current_level <= max_level_boat else max_level_boat}) - MAX"
+                text = f"{display_name} (Lvl {current_level if current_level <= max_level_boat else max_level_boat}) - MAX" 
                 action = None 
             options_list.append((text, action))
         options_list.append(("Kembali", lambda: self.game.change_state('main_menu')))

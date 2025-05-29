@@ -41,17 +41,45 @@ class UI:
             active_spot_map_name = getattr(self.game.map_explorer, 'active_spot_map_name', None)
             if active_spot_map_name:
                 for dn, sd in self.game.map_explorer.fishing_spots_data.items():
-                    if sd.get('map_name') == active_spot_map_name:
-                        current_location_name = f"Dekat: {dn}"
-                        break
-            if current_location_name == "N/A":
-                 current_location_name = "Peta Dunia"
-        elif self.game.current_state_name == 'land_explore': # --- PENAMBAHAN DI SINI ---
-            current_location_name = "Daratan"
+                    if sd.get('map_name') == active_spot_map_name: 
+                        current_location_name = f"Dekat: {dn}" 
+                        break 
+            if current_location_name == "N/A": 
+                 current_location_name = "Peta Dunia" 
+        elif self.game.current_state_name == 'land_explore': 
+            current_location_name = "Daratan" 
         
+        location_text_surface = None # Inisialisasi untuk menghindari UnboundLocalError
         if current_location_name != "N/A":
             location_text_surface = self.small_font.render(f"Lokasi: {current_location_name}", True, self.config.COLORS.get('white', (255,255,255)))
             screen.blit(location_text_surface, (10, self.font.get_height() + 15))
+
+        # --- Tambahan: Informasi Kapal dan Inventaris di Fishing State ---
+        if self.game.current_state_name == 'fishing' and self.game.boat and self.game.inventory:
+            current_y_offset = 10 + coins_text_surface.get_height() + 5 # Mulai setelah Koin
+
+            if location_text_surface: # Jika teks lokasi ada, tambahkan tingginya
+                current_y_offset += location_text_surface.get_height() + 5
+            
+            # Kecepatan Kapal
+            speed_text = f"Kecepatan: {int(self.game.boat.current_speed_value)}"
+            speed_surface = self.small_font.render(speed_text, True, self.config.COLORS.get('white'))
+            screen.blit(speed_surface, (10, current_y_offset))
+            current_y_offset += speed_surface.get_height() + 5
+
+            # Ikan Tertangkap / Kapasitas Maksimal
+            current_fish_count = len(self.game.inventory.fish_list)
+            max_capacity = self.game.boat.current_capacity_value
+            capacity_text = f"Ikan: {current_fish_count}/{max_capacity}"
+            capacity_surface = self.small_font.render(capacity_text, True, self.config.COLORS.get('white'))
+            screen.blit(capacity_surface, (10, current_y_offset))
+            current_y_offset += capacity_surface.get_height() + 5
+
+            # Panjang Kail
+            line_length_text = f"Panjang Kail: {int(self.game.boat.current_line_length_value)}m"
+            line_length_surface = self.small_font.render(line_length_text, True, self.config.COLORS.get('white'))
+            screen.blit(line_length_surface, (10, current_y_offset))
+            current_y_offset += line_length_surface.get_height() + 5 # Tambahkan offset untuk elemen berikutnya
 
         # Tampilkan info ikan yang terkait
         # Akses dengan aman, pastikan fishing_system ada dan punya atributnya

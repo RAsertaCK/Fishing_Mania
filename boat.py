@@ -6,7 +6,7 @@ class Boat:
     UPGRADE_LEVELS = {
         "speed": [200, 250, 300, 400, 500],
         "capacity": [10, 15, 20, 30, 50],
-        "sonar": [0, 1, 2, 3, 4] 
+        "line_length": [450, 500, 700, 1000, 1500] 
     }
 
     def __init__(self, game_map, config_instance, world_bounds_rect):
@@ -14,8 +14,10 @@ class Boat:
         self.config = config_instance 
         self.world_bounds_rect = world_bounds_rect 
 
-        self.upgrades = {"speed": 0, "capacity": 0, "sonar": 0} 
+        self.upgrades = {"speed": 0, "capacity": 0, "line_length": 0} 
         self.current_speed_value = self.UPGRADE_LEVELS["speed"][0] 
+        self.current_line_length_value = self.UPGRADE_LEVELS["line_length"][0] 
+        self.current_capacity_value = self.UPGRADE_LEVELS["capacity"][0] # <--- TAMBAHKAN INI: Inisialisasi current_capacity_value
         
         self.type = "default" 
         if self.game_map and hasattr(self.game_map, 'name') and self.game_map.name not in ["initial_setup", "dummy"]: 
@@ -34,7 +36,8 @@ class Boat:
             else: 
                 self.rect.centerx = initial_x
                 self.rect.midbottom = (initial_x, initial_y_bottom)
-
+        
+        self.facing_direction = -1 
 
     def load_sprite(self):
         target_image_path = os.path.join(self.config.ASSET_PATH, "Player", "kapal laut.png") 
@@ -100,6 +103,10 @@ class Boat:
 
         if upgrade_type == "speed": 
             self.current_speed_value = self.UPGRADE_LEVELS["speed"][new_level] 
+        elif upgrade_type == "line_length": 
+            self.current_line_length_value = self.UPGRADE_LEVELS["line_length"][new_level]
+        elif upgrade_type == "capacity": # <--- TAMBAHKAN INI: Update current_capacity_value
+            self.current_capacity_value = self.UPGRADE_LEVELS["capacity"][new_level]
         return True 
 
     def update(self, dt, keys):
@@ -107,11 +114,14 @@ class Boat:
             return
 
         move_amount = self.current_speed_value * dt 
+        
         if keys[pygame.K_LEFT]: 
             self.rect.x -= move_amount 
+            self.facing_direction = -1 
         if keys[pygame.K_RIGHT]: 
             self.rect.x += move_amount 
-        
+            self.facing_direction = 1 
+
         if self.world_bounds_rect:
             self.rect.left = max(self.world_bounds_rect.left, self.rect.left)
             self.rect.right = min(self.world_bounds_rect.right, self.rect.right)
@@ -121,15 +131,5 @@ class Boat:
 
     def render_with_camera(self, surface, camera): 
         if self.base_image and self.rect: 
-            surface.blit(self.base_image, camera.apply(self.rect))
-        
-        if self.upgrades.get("sonar", 0) > 0 and self.rect: 
-            try:
-                sonar_img_path = os.path.join(self.config.UI_PATH, "sonar_indicator.png") 
-                if os.path.exists(sonar_img_path): 
-                    sonar_img = self.config.load_image(sonar_img_path, scale=0.5) 
-                    
-                    boat_screen_rect = camera.apply(self.rect) 
-                    surface.blit(sonar_img, (boat_screen_rect.right - sonar_img.get_width() - 5, boat_screen_rect.top + 5)) 
-            except Exception as e: 
-                pass
+            flipped_image = pygame.transform.flip(self.base_image, self.facing_direction == 1, False)
+            surface.blit(flipped_image, camera.apply(self.rect))
