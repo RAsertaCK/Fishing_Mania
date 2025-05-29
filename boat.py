@@ -14,10 +14,13 @@ class Boat:
         self.config = config_instance 
         self.world_bounds_rect = world_bounds_rect 
 
+        # Atur default untuk upgrades, ini akan di-overwrite oleh GameData jika ada save file
         self.upgrades = {"speed": 0, "capacity": 0, "line_length": 0} 
+        
+        # Nilai-nilai ini akan diupdate oleh Game saat memuat data
         self.current_speed_value = self.UPGRADE_LEVELS["speed"][0] 
         self.current_line_length_value = self.UPGRADE_LEVELS["line_length"][0] 
-        self.current_capacity_value = self.UPGRADE_LEVELS["capacity"][0] # <--- TAMBAHKAN INI: Inisialisasi current_capacity_value
+        self.current_capacity_value = self.UPGRADE_LEVELS["capacity"][0] 
         
         self.type = "default" 
         if self.game_map and hasattr(self.game_map, 'name') and self.game_map.name not in ["initial_setup", "dummy"]: 

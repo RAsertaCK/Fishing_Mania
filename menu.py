@@ -143,16 +143,38 @@ class MainMenu(Menu):
     def __init__(self, game):
         super().__init__(game, background_image_filename="TampilanAwal.png") 
         self.title = "Fishing Mania" 
-        self.options = [
-            # Aksi "Mulai Petualangan" sekarang ke 'land_explore'
-            ("Mulai Petualangan", lambda: self.game.change_state('land_explore')), 
-            # HAPUS BARIS INI UNTUK MENGHAPUS PENGATURAN
-            # ("Pengaturan", lambda: self.game.change_state('settings')),
-            ("Toko Perahu", lambda: self.game.change_state('shop')),
+        self.update_options() # Panggil update_options untuk mengisi opsi awal
+
+    def update_options(self): #
+        # Periksa apakah ada save game untuk mengaktifkan opsi "Lanjutkan Petualangan"
+        has_save_game = os.path.exists(self.game.game_data_manager.save_file_path) #
+        
+        options_list = []
+        #if has_save_game: #
+          #  options_list.append(("Lanjutkan Petualangan", self.continue_game)) #
+        
+        options_list.extend([
+            ("Mulai Petualangan", self.start_new_game), # Aksi baru untuk mulai dari awal
+            ("Toko Perahu", lambda: self.game.change_state('shop')), 
             ("Lihat Koleksi Ikan", lambda: self.game.change_state('inventory_screen')),
             ("Jual Ikan", lambda: self.game.change_state('market_screen')),
             ("Keluar", self.quit_game)
-        ]
+        ])
+        self.options = options_list
+        self.selected_index = 0 # Reset selected index saat opsi diperbarui
+
+    def start_new_game(self): #
+        """Mereset data game dan memulai petualangan baru."""
+        print("--- MainMenu: Memulai petualangan baru. Mereset data game... ---")
+        self.game.game_data_manager.reset_game_data() #
+        self.game.change_state('land_explore') #
+
+    def continue_game(self): #
+        """Melanjutkan game dari data yang dimuat."""
+        print("--- MainMenu: Melanjutkan petualangan dari save game. ---")
+        # Data sudah dimuat di __init__ Game, jadi kita hanya perlu mengubah state
+        self.game.change_state(self.game.game_data_manager.data["current_game_state"]) #
+
 
     def quit_game(self):
         print("--- MainMenu: Aksi Keluar dipilih. ---")

@@ -18,6 +18,7 @@ from map_explore import MapExplorer
 from fishing_system import FishingSystem
 from land_explorer import LandExplorer
 from sprites import Player as LandPlayer, Spritesheet
+from game_data import GameData # <--- TAMBAHKAN INI
 
 class Game:
     def __init__(self, screen):
@@ -27,6 +28,9 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.current_fps = 0
+
+        # Inisialisasi GameData SEBELUM komponen lain yang bergantung pada data load.
+        self.game_data_manager = GameData(self) #
 
         try:
             font_name_to_load = self.config.FONT_NAME
@@ -45,7 +49,13 @@ class Game:
         except Exception as e:
             print(f"--- Game: ERROR debug font: {e}. ---"); self.debug_font = pygame.font.Font(None, 24)
 
-        self.current_state_name = 'main_menu'; self.wallet = 100
+        # Muat data game dari GameData manager
+        self.game_data_manager.load_game() #
+
+        # Inisialisasi properti game dengan data yang dimuat atau default dari GameData
+        self.wallet = self.game_data_manager.data["coins"] #
+        self.current_state_name = self.game_data_manager.data["current_game_state"] #
+
         self.inventory = Inventory(self)
         self.market = Market(self)
         class InitialDummyMap:
@@ -53,16 +63,18 @@ class Game:
         self.fishing_world_rect = pygame.Rect(0,0,self.config.SCREEN_WIDTH,self.config.SCREEN_HEIGHT) #
         
         # ---- TARGET POSISI GARIS AIR DI LAYAR (Y dari atas layar) ----
-        # Sesuai garis hitam di screenshot Anda, yaitu sekitar Y=432 (untuk layar 720p).
         self.desired_waterline_on_screen_y = 432
-        # Jika ingin tetap pakai persentase: (432.0 / self.config.SCREEN_HEIGHT) * self.config.SCREEN_HEIGHT
-        # self.desired_waterline_on_screen_y = self.config.SCREEN_HEIGHT * 0.60 # 60% dari atas layar (432 / 720 = 0.6)
-
-
         self.water_top_y_world = 0
         self.water_bottom_y_world = 0
         
         self.boat = Boat(InitialDummyMap(), self.config, self.fishing_world_rect) #
+        # Terapkan upgrade yang dimuat ke kapal setelah inisialisasi boat
+        self.boat.upgrades = self.game_data_manager.data["boat_upgrades"] #
+        self.boat.current_speed_value = self.boat.UPGRADE_LEVELS["speed"][self.boat.upgrades["speed"]] #
+        self.boat.current_capacity_value = self.boat.UPGRADE_LEVELS["capacity"][self.boat.upgrades["capacity"]] #
+        self.boat.current_line_length_value = self.boat.UPGRADE_LEVELS["line_length"][self.boat.upgrades["line_length"]] #
+
+
         self.main_menu=MainMenu(self); self.settings_menu=SettingsMenu(self); self.shop_menu=ShopMenu(self)
         self.market_screen=MarketScreen(self); self.inventory_screen=InventoryScreen(self)
         self.all_sprites=pygame.sprite.Group(); self.blocks=pygame.sprite.Group()
@@ -76,16 +88,47 @@ class Game:
         self.visible_fish_sprites=pygame.sprite.Group()
         self.ui=UI(self); print("--- Game: Game.__init__() selesai. ---")
 
-        # --- BARU: Menyimpan status lokasi yang sudah dibuka ---
-        # Awalnya hanya Pantai Lokal yang terbuka
-        self.unlocked_locations = {
-            "Coast": True,
-            "Sea": False,
-            "Ocean": False
-        }
+        # ---- Menggunakan data yang dimuat untuk unlocked_locations ----
+        self.unlocked_locations = self.game_data_manager.data["unlocked_locations"] #
+
+        # Panggil load data inventory setelah inventory diinisialisasi
+        if self.game_data_manager.data["collected_fish"]: #
+            from fish import Fish # Impor di sini untuk menghindari circular dependency
+            for fish_dict in self.game_data_manager.data["collected_fish"]: #
+                self.inventory.add_fish_from_data(fish_dict) #
+            print(f"--- Game: Inventaris dimuat dengan {len(self.inventory.fish_list)} ikan. ---") #
+        
+        # Panggil update_options untuk menu yang relevan setelah data dimuat
+        self.shop_menu.update_options()
+        self.market_screen.update_options()
+        self.inventory_screen.update_options()
+
+        # Atur posisi awal kapal di map explorer setelah data dimuat
+        if self.map_explorer and hasattr(self.map_explorer, 'player_map_rect'):
+            player_map_pos = self.game_data_manager.data["player_map_position"]
+            self.map_explorer.player_map_rect.centerx = player_map_pos["x"]
+            self.map_explorer.player_map_rect.centery = player_map_pos["y"]
+            print(f"--- Game: Posisi map_explorer dimuat: {self.map_explorer.player_map_rect.center} ---")
+        
+        # Jika game dimulai dari state selain main_menu, pastikan setup scene dilakukan
+        if self.current_state_name != 'main_menu': #
+            # HACK: change_state perlu dipanggil setelah semua inisialisasi
+            # Karena change_state memanggil setup_scene dan memuat ulang objek
+            # yang mungkin memerlukan semua dependensi (boat, map_explorer, dll)
+            # yang sudah terinisialisasi dan terisi data dari game_data_manager.
+            # Namun, memanggilnya di sini bisa menyebabkan masalah re-initialization.
+            # Solusi yang lebih baik adalah memindahkan logika setup_scene ke dalam __init__
+            # untuk setiap kelas state, atau memastikan change_state cukup cerdas.
+            # Untuk demo ini, kita akan biarkan seperti ini dan asumsikan game dimulai dari menu utama
+            # atau secara manual mengarahkan ke state yang dimuat setelah menu utama.
+            pass
+
 
     def change_state(self, new_state_name, data=None):
         print(f"--- Game: State: {self.current_state_name} -> {new_state_name} ---")
+        # Simpan game setiap kali state berubah (atau saat keluar)
+        self.game_data_manager.save_game() #
+
         self.all_sprites.empty(); self.blocks.empty()
         if self.current_state_name not in ['main_menu','settings','shop','market_screen','inventory_screen'] and \
            new_state_name in ['main_menu','settings','shop','market_screen','inventory_screen']:
@@ -137,7 +180,7 @@ class Game:
                     if self.player: self.player.update_position()
                     
                     if self.boat and self.boat.rect: #
-                         # Target Y kamera agar self.boat.rect.bottom (Y dunia) muncul di self.desired_waterline_on_screen_y (Y layar)
+                         # Target Y kamera agar self.boat.rect.bottom (Y dunia) muncul di self.desired_waterline_on_screen_y
                          target_focus_y_world = self.boat.rect.bottom - (self.desired_waterline_on_screen_y - (self.config.SCREEN_HEIGHT / 2)) #
                                                   
                          initial_focus_rect = pygame.Rect(0,0,1,1)
@@ -158,7 +201,10 @@ class Game:
             if self.market_screen: self.market_screen.update_options() #
         elif new_state_name == 'inventory_screen': #
             if self.inventory_screen: self.inventory_screen.update_options() #
-
+            
+        # Perbarui tampilan UI jika berubah ke state menu
+        self.ui.update_display_info() #
+        
     def spawn_visible_fish(self, amount=5):
         # ... (Sama seperti sebelumnya) ...
         if not self.current_game_map or not self.fishing_camera: return 
@@ -182,11 +228,16 @@ class Game:
     def run(self):
         # ... (Sama seperti sebelumnya) ...
         print("--- Game: Memulai Game.run()... ---"); print("--- Game: Memasuki game loop utama. ---")
+        # Panggil change_state awal untuk mengatur scene yang dimuat
+        self.change_state(self.current_state_name) #
+
         while self.running:
             dt = self.clock.tick(self.config.FPS)/1000.0; dt=min(dt,0.1) #
             self.current_fps = self.clock.get_fps()
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: self.running = False
+                if event.type == pygame.QUIT: 
+                    self.running = False
+                    self.game_data_manager.save_game() # # Simpan saat game ditutup
                 if self.running: self.handle_state_specific_event(event)
             if not self.running: break
             try: self.update_current_state(dt)
@@ -332,3 +383,10 @@ class Game:
                 afs = self.debug_font.render(active_fish_info, True, self.config.COLORS.get('white')); self.screen.blit(afs, (self.config.SCREEN_WIDTH - afs.get_width() - 10, 10)) #
 
         pygame.display.flip()
+
+    def quit_game(self):
+        """Menyimpan game sebelum keluar."""
+        print("--- Game: Menyimpan game sebelum keluar... ---")
+        self.game_data_manager.save_game() #
+        pygame.quit()
+        sys.exit()

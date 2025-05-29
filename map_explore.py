@@ -82,7 +82,11 @@ class MapExplorer:
             print(f"--- MapExplorer: Menggunakan latar belakang warna solid karena peta tidak termuat.")
 
         # Player (Boat) Initialization
-        self.player_world_pos = [self.config.SCREEN_WIDTH * 0.6, self.config.SCREEN_HEIGHT * 0.65]
+        # Posisi awal pemain di peta diambil dari game.game_data_manager.data
+        self.player_world_pos = [
+            self.game.game_data_manager.data["player_map_position"]["x"],
+            self.game.game_data_manager.data["player_map_position"]["y"]
+        ]
         self.player_speed = 200 # Kecepatan pemain di peta
         self.player_boat_image = None
         self.player_map_rect = None # Ini akan menjadi rect untuk kapal di peta
@@ -196,8 +200,8 @@ class MapExplorer:
                             map_name = selected_spot_data['map_name']
                             display_name = selected_spot_data['display_name']
 
-                            # --- Cek status wilayah ---
-                            is_unlocked = self.game.unlocked_locations.get(map_name, False) # Ambil status dari game.py
+                            # --- Cek status wilayah dari Game.unlocked_locations ---
+                            is_unlocked = self.game.unlocked_locations.get(map_name, False) #
 
                             if is_unlocked:
                                 print(f"--- MapExplorer: Pemain memilih lokasi memancing: {self.active_target_state_name} ---")
@@ -207,7 +211,7 @@ class MapExplorer:
                             elif self.game.wallet >= unlock_cost:
                                 # Wilayah terkunci tapi koin cukup, lakukan pembelian
                                 self.game.wallet -= unlock_cost
-                                self.game.unlocked_locations[map_name] = True # Tandai sebagai terbuka permanen
+                                self.game.unlocked_locations[map_name] = True # # Tandai sebagai terbuka permanen
                                 print(f"--- MapExplorer: {display_name} berhasil dibuka! Koin berkurang {unlock_cost}. Sisa koin: {self.game.wallet} ---")
                                 self.locked_spot_message = None # Reset pesan
                                 # Jangan langsung masuk ke state fishing, biarkan pemain melihat update UI dan tekan ENTER lagi
@@ -263,7 +267,7 @@ class MapExplorer:
                     display_name_for_prompt = spot_data.get('display_name', display_name_key) 
 
                     # --- Logika UI untuk wilayah terkunci/terbuka/bisa dibeli ---
-                    is_unlocked = self.game.unlocked_locations.get(map_name, False)
+                    is_unlocked = self.game.unlocked_locations.get(map_name, False) #
 
                     self.active_target_state_name = map_name # Tetapkan target state
                     
@@ -296,7 +300,7 @@ class MapExplorer:
             # Perbarui warna dan teks berdasarkan status terkunci
             unlock_cost = spot_data.get('unlock_cost', 0)
             map_name = spot_data['map_name']
-            is_unlocked = self.game.unlocked_locations.get(map_name, False) # Ambil status dari game.py
+            is_unlocked = self.game.unlocked_locations.get(map_name, False) # # Ambil status dari game.py
 
             color_key = 'text_default' # Default color
             spot_label_text = spot_data.get('display_name', display_name_key) # Ambil display_name dari data

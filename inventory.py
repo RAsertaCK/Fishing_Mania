@@ -7,10 +7,11 @@ class Inventory:
     def add(self, fish):
         self.fish_list.append(fish)
 
-    # Metode ini mungkin tidak digunakan jika game menggunakan add_fish_from_data
     def add_fish_from_data(self, fish_data):
-        # Asumsi fish_data adalah dictionary seperti yang ada di GameMap.LOCATIONS
-        # Kita perlu membuat instance Fish dari data ini
+        """
+        Menambahkan ikan ke inventaris dari data kamus (biasanya dimuat dari JSON).
+        Membuat instance Fish baru dari data yang diberikan.
+        """
         from fish import Fish # Impor di sini untuk menghindari circular dependency
         # Posisi dummy (0,0) karena ikan di inventaris tidak dirender di dunia
         new_fish = Fish(fish_data, (0,0), self.game.config) # <--- PERBAIKAN: Tambahkan self.game.config
@@ -31,5 +32,5 @@ class Inventory:
     def render(self, screen, font):
         screen.blit(font.render("Inventory:", True, (255, 255, 255)), (10, 100))
         for i, (name, count) in enumerate(self.get_summary().items()):
-            text = font.render(f"{name} x{count}", True, (200, 200, 200))
+            text = font.render(f"{name} ({count})", True, (200, 200, 200))
             screen.blit(text, (10, 130 + i * 25))
