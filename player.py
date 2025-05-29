@@ -9,13 +9,14 @@ class Player:
         self.config = self.game.config 
 
         sprite_x = 0 
-        sprite_y = 114 
+        sprite_y = 114 # Y-koordinat sprite pada spritesheet
         sprite_width = 34 
         sprite_height = 34 
 
         try:
             if self.game.character_spritesheet and hasattr(self.game.character_spritesheet, 'get_sprite'): 
                 self.image_original = self.game.character_spritesheet.get_sprite(sprite_x, sprite_y, sprite_width, sprite_height) 
+                # Skala sprite pemancing (misal 0.7x dari ukuran asli di spritesheet)
                 scaled_width = int(sprite_width * 0.7) 
                 scaled_height = int(sprite_height * 0.7) 
                 self.image = pygame.transform.scale(self.image_original, (scaled_width, scaled_height)) 
@@ -38,16 +39,27 @@ class Player:
     def update_position(self):
         if self.boat and self.boat.rect: 
             self.rect.centerx = self.boat.rect.centerx 
-            self.rect.midbottom = self.boat.rect.midtop 
+            
+            # --- PERUBAHAN DI SINI untuk menurunkan pemancing relatif terhadap perahu ---
+            # Ambil posisi midtop perahu
+            boat_midtop_x, boat_midtop_y = self.boat.rect.midtop
+            
+            # Tambahkan offset Y untuk menurunkan pemancing
+            # Nilai positif akan menurunkan pemancing. Sesuaikan angka 10 ini.
+            y_offset_on_boat = 10
+            
+            
+            self.rect.midbottom = (boat_midtop_x, boat_midtop_y + y_offset_on_boat)
+            # --- Akhir Perubahan ---
+            
         elif not self.boat: 
             if self.rect is None and self.image: 
                  self.rect = self.image.get_rect()
             if self.rect:
                 self.rect.center = (self.config.SCREEN_WIDTH // 2, self.config.SCREEN_HEIGHT // 2)
 
-
     def update(self, dt):
-        self.update_position() 
+        self.update_position() # Pastikan posisi selalu update relatif terhadap perahu
 
     def handle_event(self, event): 
         pass 
