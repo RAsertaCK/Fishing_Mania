@@ -17,7 +17,7 @@ class UI:
                 self.small_font = pygame.font.Font(font_name_to_load, small_font_size)
             else:
                 if font_name_to_load and font_name_to_load.lower() != 'none':
-                     pass 
+                     pass
                 fallback_font_name_ui = "arial"
                 if font_name_to_load and font_name_to_load.lower() != 'none' and font_name_to_load != "":
                     fallback_font_name_ui = font_name_to_load
@@ -25,7 +25,7 @@ class UI:
                 self.font = pygame.font.SysFont(fallback_font_name_ui, medium_font_size)
                 self.small_font = pygame.font.SysFont(fallback_font_name_ui, small_font_size)
         except Exception as e:
-            self.font = pygame.font.Font(None, 30) 
+            self.font = pygame.font.Font(None, 30)
             self.small_font = pygame.font.Font(None, 18)
 
     def render(self, screen):
@@ -41,10 +41,10 @@ class UI:
             active_spot_map_name = getattr(self.game.map_explorer, 'active_spot_map_name', None)
             if active_spot_map_name:
                 for dn, sd in self.game.map_explorer.fishing_spots_data.items():
-                    if sd.get('map_name') == active_spot_map_name: 
+                    if sd.get('map_name') == active_spot_map_name:
                         current_location_name = f"Dekat: {dn}"
                         break
-            if current_location_name == "N/A": 
+            if current_location_name == "N/A":
                  current_location_name = "Peta Dunia"
         elif self.game.current_state_name == 'land_explore': # --- PENAMBAHAN DI SINI ---
             current_location_name = "Daratan"
@@ -58,14 +58,14 @@ class UI:
         if self.game.current_state_name == 'fishing' and \
            self.game.fishing_system and \
            hasattr(self.game.fishing_system, 'current_hooked_fish_data') and \
-           self.game.fishing_system.current_hooked_fish_data: 
+           self.game.fishing_system.current_hooked_fish_data:
             
             hooked_fish_data = self.game.fishing_system.current_hooked_fish_data
             fish_name = hooked_fish_data.get('name', 'Ikan Misterius') if isinstance(hooked_fish_data, dict) else getattr(hooked_fish_data, 'name', 'Ikan Misterius')
             fish_rarity = hooked_fish_data.get('rarity', 'N/A') if isinstance(hooked_fish_data, dict) else getattr(hooked_fish_data, 'rarity', 'N/A')
             
             fish_info_text = f"TERKAIT: {fish_name} ({fish_rarity})"
-            fish_info_surface = self.font.render(fish_info_text, True, self.config.COLORS.get('legendary')) 
+            fish_info_surface = self.font.render(fish_info_text, True, self.config.COLORS.get('legendary'))
             fish_info_rect = fish_info_surface.get_rect(midtop=(self.config.SCREEN_WIDTH // 2, 10))
             screen.blit(fish_info_surface, fish_info_rect)
 
@@ -77,14 +77,14 @@ class UI:
             
             if self.game.fishing_system.max_hook_depth > 0:
                 depth_percent = self.game.fishing_system.hook_depth / self.game.fishing_system.max_hook_depth
-                depth_percent = max(0, min(1, depth_percent)) 
+                depth_percent = max(0, min(1, depth_percent))
 
-                bar_width = 120 
+                bar_width = 120
                 bar_height = 15
                 bar_x = self.config.SCREEN_WIDTH - bar_width - 10
-                bar_y = 10 
+                bar_y = 10
                 
-                pygame.draw.rect(screen, self.config.COLORS.get('white'), (bar_x - 2, bar_y - 2, bar_width + 4, bar_height + 4), 2) 
+                pygame.draw.rect(screen, self.config.COLORS.get('white'), (bar_x - 2, bar_y - 2, bar_width + 4, bar_height + 4), 2)
                 fill_width = bar_width * depth_percent
                 pygame.draw.rect(screen, self.config.COLORS.get('blue'), (bar_x, bar_y, fill_width, bar_height))
                 

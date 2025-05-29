@@ -44,24 +44,29 @@ class Menu:
         medium_size = self.config.FONT_SIZES.get('medium', 30)
         title_size_key = 'title' if 'title' in self.config.FONT_SIZES else 'large' # Cek apakah 'title' ada
         title_size = self.config.FONT_SIZES.get(title_size_key, 50)
+        small_size = self.config.FONT_SIZES.get('small', 18) # Untuk teks koin
 
         try:
             if actual_font_path: # Jika path font valid ditemukan
                 self.font = pygame.font.Font(actual_font_path, medium_size)
                 self.title_font = pygame.font.Font(actual_font_path, title_size)
+                self.small_font = pygame.font.Font(actual_font_path, small_size) # Inisialisasi small_font
                 print(f"--- Menu ({self.__class__.__name__}): Font '{actual_font_path}' berhasil dimuat.")
             elif font_name_to_load and font_name_to_load.strip() != "" and font_name_to_load.lower() != 'none': # Coba sebagai SysFont
                 self.font = pygame.font.SysFont(font_name_to_load, medium_size)
                 self.title_font = pygame.font.SysFont(font_name_to_load, title_size)
+                self.small_font = pygame.font.SysFont(font_name_to_load, small_size) # Inisialisasi small_font
                 print(f"--- Menu ({self.__class__.__name__}): Menggunakan SysFont '{font_name_to_load}'.")
             else: # Fallback absolut jika FONT_NAME None atau kosong
                 self.font = pygame.font.Font(None, medium_size) # Default Pygame font
                 self.title_font = pygame.font.Font(None, title_size) # Default Pygame font
+                self.small_font = pygame.font.Font(None, small_size) # Default Pygame font
                 print(f"--- Menu ({self.__class__.__name__}): Menggunakan pygame.font.Font(None, size) default.")
         except Exception as e:
             print(f"--- Menu ({self.__class__.__name__}): ERROR FONT - {e}. Menggunakan default absolut pygame.font.Font(None, size).")
             self.font = pygame.font.Font(None, medium_size)
             self.title_font = pygame.font.Font(None, title_size)
+            self.small_font = pygame.font.Font(None, small_size) # Fallback small_font
 
 
     def handle_event(self, event):
@@ -126,6 +131,13 @@ class Menu:
                 # Gambar bayangan dulu, lalu teks utama
                 screen.blit(shadow_surface, (option_rect.x + shadow_offset, option_rect.y + shadow_offset)) 
                 screen.blit(option_surface, option_rect) 
+
+        # --- Tampilkan Koin di Semua Menu (Posisi Kanan Atas) ---
+        if hasattr(self.game, 'wallet') and hasattr(self, 'small_font') and self.small_font: # Pastikan game.wallet dan small_font ada
+            coins_text_surface = self.small_font.render(f"Koin: {self.game.wallet}", True, self.config.COLORS.get('text_selected', (255,255,0)))
+            coins_text_rect = coins_text_surface.get_rect(topright=(self.config.SCREEN_WIDTH - 10, 10))
+            screen.blit(coins_text_surface, coins_text_rect)
+
 
 class MainMenu(Menu):
     def __init__(self, game):
