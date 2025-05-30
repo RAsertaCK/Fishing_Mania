@@ -35,6 +35,7 @@ class Game:
         self.wallet = 0 
         self.current_state_name = "main_menu" 
         self.unlocked_locations = {"Coast": True, "Sea": False, "Ocean": False}
+        self.current_music_file = None # Atribut untuk melacak musik
 
         # 2. Inisialisasi komponen game yang mungkin dibutuhkan oleh GameData
         #    atau yang datanya akan diisi/diupdate oleh GameData.load_game()
@@ -144,6 +145,35 @@ class Game:
         self.inventory_screen.update_options()
         
         print(f"--- Game: Game.__init__() selesai. Wallet akhir init: {self.wallet}, State awal: {self.current_state_name} ---")
+
+    def _play_music(self, filename):
+        """Metode terpusat untuk memutar, menghentikan, dan mengubah musik."""
+        # Jika tidak ada nama file, hentikan musik yang sedang diputar.
+        if not filename:
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.fadeout(500) # Fade out halus
+            self.current_music_file = None
+            return
+
+        # Jangan restart jika musik yang benar sudah diputar
+        if self.current_music_file == filename and pygame.mixer.music.get_busy():
+            return
+        
+        # Jika musik berbeda atau tidak ada yang diputar, muat dan mainkan yang baru.
+        self.current_music_file = filename
+        full_path = os.path.join(self.config.SOUND_PATH, filename)
+
+        if os.path.exists(full_path):
+            try:
+                pygame.mixer.music.load(full_path)
+                pygame.mixer.music.play(-1, fade_ms=500) # -1 untuk loop, fade_ms untuk fade in
+                print(f"--- Game Music: Memutar '{filename}' ---")
+            except pygame.error as e:
+                print(f"--- Game Music ERROR: Tidak dapat memutar musik '{full_path}': {e} ---")
+                self.current_music_file = None
+        else:
+            print(f"--- Game Music WARNING: File musik tidak ditemukan: '{full_path}' ---")
+            self.current_music_file = None
 
     def run(self):
         print("--- Game: Memulai Game.run()... ---")
@@ -258,9 +288,6 @@ class Game:
              self.game_data_manager.save_game() # save_game akan print nilai koin yang disimpan
         
         self.all_sprites.empty(); self.blocks.empty()
-        is_current_gameplay = self.current_state_name not in ['main_menu', 'shop', 'market_screen', 'inventory_screen']
-        is_new_menu = new_state_name in ['main_menu', 'shop', 'market_screen', 'inventory_screen']
-        if is_current_gameplay and is_new_menu and pygame.mixer.music.get_busy(): pygame.mixer.music.fadeout(500)
         
         self.current_state_name = new_state_name
         
@@ -279,7 +306,6 @@ class Game:
                 location_name = data['location_name']
                 try:
                     self.current_game_map = GameMap(location_name, self.config) 
-                    if hasattr(self.current_game_map,'play_music'): self.current_game_map.play_music() 
                     fishing_world_width = int(self.config.SCREEN_WIDTH*1.2); fishing_world_height = int(self.config.SCREEN_HEIGHT*2.0) 
                     self.fishing_world_rect.size = (fishing_world_width, fishing_world_height)
                     self.fishing_camera.world_width = fishing_world_width; self.fishing_camera.world_height = fishing_world_height
@@ -307,6 +333,22 @@ class Game:
         elif new_state_name == 'inventory_screen': 
             if self.inventory_screen: self.inventory_screen.update_options() 
         if self.ui: self.ui.update_display_info()
+        
+        # --- LOGIKA MUSIK BARU ---
+        target_music_file = None
+        if new_state_name == 'land_explore':
+            target_music_file = 'Land.ogg'
+        elif new_state_name in ['main_menu', 'map_explore']: # <-- PERUBAHAN DI SINI
+            target_music_file = 'Wave.ogg' # <-- PERUBAHAN DI SINI
+        elif new_state_name == 'fishing':
+            if self.current_game_map and self.current_game_map.data:
+                target_music_file = self.current_game_map.data.get('music')
+        
+        # Panggil metode pemutar musik terpusat.
+        # Ini akan menangani penghentian, perubahan, dan pemutaran musik.
+        self._play_music(target_music_file)
+        # --- AKHIR LOGIKA MUSIK BARU ---
+
 
     def spawn_visible_fish(self, amount=5):
         if not self.current_game_map or not self.fishing_camera or self.current_state_name!='fishing': return 

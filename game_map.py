@@ -13,7 +13,7 @@ class GameMap:
             ],
             "background_file": "Pantai.png", 
             "depth_range": (50, 150), 
-            "music": "coast_theme.ogg" 
+            "music": "Coast_song.ogg"  # <-- PERUBAHAN NAMA FILE
         },
         "Sea": {
             "display_name": "Laut Lepas",
@@ -24,7 +24,7 @@ class GameMap:
             ],
             "background_file": "Lautan.png", 
             "depth_range": (100, 300), 
-            "music": "sea_theme.ogg" 
+            "music": "Sea_song.ogg"  # <-- PERUBAHAN NAMA FILE
         },
         "Ocean": {
             "display_name": "Samudra Dalam",
@@ -35,7 +35,7 @@ class GameMap:
             ],
             "background_file": "Samudra.png", 
             "depth_range": (200, 500), 
-            "music": "ocean_theme.ogg" 
+            "music": "Ocean_song.ogg"  # <-- PERUBAHAN NAMA FILE
         }
     }
 
@@ -132,15 +132,6 @@ class GameMap:
         chosen_fish_data = random.choices(fish_pool, weights=weights, k=1)[0] 
         return chosen_fish_data 
 
-
-    def play_music(self):
-        # ... (kode play_music tetap sama) ...
-        music_file = self.data.get("music") 
-        if music_file: 
-            music_path = os.path.join(self.config.SOUND_PATH, music_file) #
-            if os.path.exists(music_path): 
-                try:
-                    pygame.mixer.music.load(music_path) 
-                    pygame.mixer.music.play(-1, fade_ms=1000) 
-                except pygame.error as e: 
-                    print(f"Error memainkan musik {music_file}: {e}")
+    # HAPUS METODE play_music() DARI SINI
+    # def play_music(self):
+    #     ...
