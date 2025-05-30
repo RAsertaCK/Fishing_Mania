@@ -1,19 +1,38 @@
 {
-    "coins": 300,
+    "coins": 3850,
     "boat_upgrades": {
-        "speed": 0,
-        "capacity": 0,
+        "speed": 4,
+        "capacity": 4,
         "line_length": 4
     },
     "unlocked_locations": {
         "Coast": true,
-        "Sea": false,
-        "Ocean": false
+        "Sea": true,
+        "Ocean": true
     },
-    "collected_fish": [],
+    "collected_fish": [
+        {
+            "name": "Whale",
+            "rarity": "legendary",
+            "value": 1000,
+            "image_suffix": "whale"
+        },
+        {
+            "name": "Shark",
+            "rarity": "legendary",
+            "value": 400,
+            "image_suffix": "shark"
+        },
+        {
+            "name": "Whale",
+            "rarity": "legendary",
+            "value": 1000,
+            "image_suffix": "whale"
+        }
+    ],
     "player_map_position": {
-        "x": 747,
-        "y": 468
+        "x": 160,
+        "y": 111
     },
-    "current_game_state": "main_menu"
+    "current_game_state": "fishing"
 }
