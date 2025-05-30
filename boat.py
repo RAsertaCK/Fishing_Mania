@@ -6,7 +6,7 @@ class Boat:
     UPGRADE_LEVELS = {
         "speed": [200, 250, 300, 400, 500],
         "capacity": [10, 15, 20, 30, 50],
-        "line_length": [450, 500, 700, 1000, 1500] 
+        "line_length": [450, 500, 700, 850, 1000] 
     }
 
     def __init__(self, game_map, config_instance, world_bounds_rect):

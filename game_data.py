@@ -123,41 +123,12 @@ class GameData:
 
     # --- METODE BARU UNTUK "MULAI PETUALANGAN" ---
     def reset_for_new_adventure(self):
-        """
-        Mereset aspek game untuk petualangan baru, TAPI MEMPERTAHANKAN KOIN saat ini.
-        Mereset: posisi pemain, ikan di inventaris, upgrade perahu (ke level 0), lokasi terbuka (ke default).
-        """
-        print("--- GameData: Mereset untuk PETUALANGAN BARU (koin dipertahankan)... ---")
-        
-        current_coins = 0
-        if hasattr(self.game, 'wallet'):
-            current_coins = self.game.wallet
-        print(f"--- GameData: reset_for_new_adventure - Koin saat ini yang akan dipertahankan: {current_coins} ---")
+    # game_data.py
 
-        # Dapatkan struktur data awal yang bersih (ini akan memiliki koin=100, upgrade=0, dll.)
-        data_for_new_adventure = self._get_initial_data() 
-        
-        # --- Modifikasi data awal ini ---
-        # 1. Atur koin ke nilai koin saat ini yang sudah disimpan
-        data_for_new_adventure["coins"] = current_coins
-        
-        # 2. Aspek lain akan menggunakan nilai default dari _get_initial_data():
-        #    - "boat_upgrades" akan menjadi {"speed": 0, "capacity": 0, "line_length": 0}
-        #    - "unlocked_locations" akan menjadi {"Coast": True, "Sea": False, "Ocean": False}
-        #    - "collected_fish" akan menjadi []
-        #    - "player_map_position" akan menjadi posisi awal default
-        #    - "current_game_state" dari _get_initial_data adalah "main_menu", ini akan diset di game instance
-        #      tapi pemanggil (MainMenu.start_new_game) akan mengubah state ke 'land_explore'.
-
-        print(f"--- GameData: reset_for_new_adventure - Data yang akan diterapkan: Koin={data_for_new_adventure['coins']}, Upgrades={data_for_new_adventure['boat_upgrades']} ---")
-
-        # Terapkan data yang sudah dimodifikasi ini ke instance Game (self.game)
-        self._apply_data_to_game_instance(data_for_new_adventure, "reset_for_new_adventure (soft_reset)")
-        
-        # Update self.data internal GameData agar konsisten dengan apa yang baru saja diterapkan dan akan disimpan.
-        self.data = data_for_new_adventure.copy()
-        
-        # Simpan game dengan kondisi "petualangan baru" ini
-        self.save_game()
+        def reset_for_new_adventure(self):
+        # FUNGSI INI SENGAJA DIBUAT TIDAK MELAKUKAN RESET APAPUN LAGI.
+        # Ia hanya memastikan game tersimpan sebelum lanjut.
+            print("--- GameData: Fitur 'reset_for_new_adventure' sudah dinonaktifkan. Hanya menyimpan progres saat ini. ---")
+            self.save_game() # Cukup panggil save_game() untuk memastikan semua progres terakhir aman.
         
         print(f"--- GameData: Reset untuk PETUALANGAN BARU selesai. Koin game sekarang: {self.game.wallet if hasattr(self.game, 'wallet') else 'N/A'} ---")

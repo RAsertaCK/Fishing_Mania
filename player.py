@@ -9,7 +9,7 @@ class Player:
         self.config = self.game.config 
 
         sprite_x = 0 
-        sprite_y = 114 # Y-koordinat sprite pada spritesheet
+        sprite_y = 200 # Y-koordinat sprite pada spritesheet
         sprite_width = 34 
         sprite_height = 34 
 

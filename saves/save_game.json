@@ -1,9 +1,9 @@
 {
-    "coins": 175,
+    "coins": 300,
     "boat_upgrades": {
         "speed": 0,
         "capacity": 0,
-        "line_length": 0
+        "line_length": 4
     },
     "unlocked_locations": {
         "Coast": true,
@@ -12,8 +12,8 @@
     },
     "collected_fish": [],
     "player_map_position": {
-        "x": 1188,
-        "y": 646
+        "x": 774,
+        "y": 468
     },
     "current_game_state": "main_menu"
 }
