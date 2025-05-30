@@ -44,7 +44,7 @@ class Config:
     BLOCK_LAYER = 3 
     GROUND_LAYER = 1 
     PLAYER_SPEED = 3 # Anda bisa coba naikkan ini jika ingin pemain bergerak lebih cepat/kamera terasa lebih responsif
-    PLAYER_SPRITE_SCALE = 2.0
+    PLAYER_SPRITE_SCALE = 1.5
 
     @staticmethod
     def create_placeholder_surface(width=50, height=50, color=(255, 0, 255, 128)):
