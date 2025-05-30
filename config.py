@@ -4,7 +4,7 @@ import os
 
 class Config:
     # Display
-    SCREEN_WIDTH = 1290
+    SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 720
     FPS = 60
     DEBUG = False # <--- UBAH INI MENJADI FALSE
