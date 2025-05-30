@@ -1,13 +1,13 @@
 {
-    "coins": 65,
+    "coins": 175,
     "boat_upgrades": {
         "speed": 0,
-        "capacity": 1,
-        "line_length": 1
+        "capacity": 0,
+        "line_length": 0
     },
     "unlocked_locations": {
         "Coast": true,
-        "Sea": true,
+        "Sea": false,
         "Ocean": false
     },
     "collected_fish": [],

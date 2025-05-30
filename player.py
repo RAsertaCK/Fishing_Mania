@@ -46,7 +46,7 @@ class Player:
             
             # Tambahkan offset Y untuk menurunkan pemancing
             # Nilai positif akan menurunkan pemancing. Sesuaikan angka 10 ini.
-            y_offset_on_boat = 10
+            y_offset_on_boat = 20
             
             
             self.rect.midbottom = (boat_midtop_x, boat_midtop_y + y_offset_on_boat)
