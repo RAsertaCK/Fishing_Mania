@@ -12,8 +12,8 @@
     },
     "collected_fish": [],
     "player_map_position": {
-        "x": 181,
-        "y": 120
+        "x": 340,
+        "y": 266
     },
-    "current_game_state": "land_explore"
+    "current_game_state": "main_menu"
 }
